@@ -7,12 +7,14 @@ import androidx.fragment.app.FragmentPagerAdapter
 import au.edu.swin.sdmd.l08_inafile_2023.R
 import au.edu.swin.sdmd.l08_inafile_2023.ui.main.converter.ConverterFragment
 import au.edu.swin.sdmd.l08_inafile_2023.ui.main.history.HistoryFragment
+import au.edu.swin.sdmd.l08_inafile_2023.ui.main.longtask.LongTaskFragment
 import au.edu.swin.sdmd.l08_inafile_2023.ui.main.process.ProcessFragment
 
 private val TAB_TITLES = arrayOf(
     R.string.title_process,
     R.string.title_converter,
-    R.string.title_history
+    R.string.title_history,
+    R.string.title_longlist
 )
 
 /**
@@ -29,6 +31,7 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
             0 -> ProcessFragment.newInstance(0)
             1 -> ConverterFragment.newInstance(1)
             2 -> HistoryFragment.newInstance(2)
+            3 -> LongTaskFragment.newInstance(2)
             else -> ConverterFragment.newInstance(0)
         }
     }
@@ -39,6 +42,6 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
 
     override fun getCount(): Int {
         // Show 3 total pages.
-        return 3
+        return 4
     }
 }
