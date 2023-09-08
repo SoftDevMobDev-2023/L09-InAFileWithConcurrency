@@ -2,12 +2,16 @@ package au.edu.swin.sdmd.l08_inafile_2023.ui.main.longtask
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioGroup
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import au.edu.swin.sdmd.l08_inafile_2023.ButtonViewModel
@@ -19,6 +23,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import androidx.fragment.app.activityViewModels
+import au.edu.swin.sdmd.l08_inafile_2023.data.KeyStore
+
 
 class LongTaskFragment : Fragment() {
     private val job = Job()
@@ -33,6 +39,25 @@ class LongTaskFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.fragment_longtask, container, false)
         val bLong: Button = root.findViewById(R.id.bLong)
+        val cgGroup: RadioGroup = root.findViewById(R.id.radioGroup)
+
+        context?.let {
+            val store = KeyStore(it)
+            // if option saved, updated checkboxgroup
+            val job = scope.launch {
+                store.getOption.collect { option ->
+                    cgGroup.check(option)
+                }
+            }
+            // if checkbox selected, save option id
+            cgGroup.setOnCheckedChangeListener { _, i ->
+                val job = scope.launch {
+                    store.saveOption(i)
+                }
+            }
+
+        }
+
 
         /*val buttonObserver = Observer<Boolean> { state ->
             bLong.isEnabled = state
@@ -40,7 +65,7 @@ class LongTaskFragment : Fragment() {
         viewModel.buttonState.observe(viewLifecycleOwner, buttonObserver)*/
 
         bLong.setOnClickListener {
-            bLong.isEnabled = false
+            //bLong.isEnabled = false
             //viewModel.buttonState.value = false
             val cgGroup: RadioGroup = root.findViewById(R.id.radioGroup)
             val listLength = when (cgGroup.checkedRadioButtonId) {
@@ -51,7 +76,7 @@ class LongTaskFragment : Fragment() {
             }
             scope.launch {
                 writeFile(context, listLength)
-                bLong.isEnabled = true
+                //bLong.isEnabled = true
                 //viewModel.buttonState.postValue(true)
 
             }
