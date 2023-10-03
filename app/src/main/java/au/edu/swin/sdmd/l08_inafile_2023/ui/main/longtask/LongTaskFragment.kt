@@ -19,6 +19,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import androidx.fragment.app.activityViewModels
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 
 class LongTaskFragment : Fragment() {
     private val job = Job()
@@ -33,6 +36,8 @@ class LongTaskFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.fragment_longtask, container, false)
         val bLong: Button = root.findViewById(R.id.bLong)
+        val bWorker: Button = root.findViewById(R.id.bWorker)
+
 
         /*val buttonObserver = Observer<Boolean> { state ->
             bLong.isEnabled = state
@@ -40,7 +45,7 @@ class LongTaskFragment : Fragment() {
         viewModel.buttonState.observe(viewLifecycleOwner, buttonObserver)*/
 
         bLong.setOnClickListener {
-            bLong.isEnabled = false
+            //bLong.isEnabled = false
             //viewModel.buttonState.value = false
             val cgGroup: RadioGroup = root.findViewById(R.id.radioGroup)
             val listLength = when (cgGroup.checkedRadioButtonId) {
@@ -49,13 +54,25 @@ class LongTaskFragment : Fragment() {
                 R.id.longList -> 100000
                 else -> 1
             }
-            scope.launch {
+            //scope.launch {
                 writeFile(context, listLength)
-                bLong.isEnabled = true
+                //bLong.isEnabled = true
                 //viewModel.buttonState.postValue(true)
 
+            //}
+        }
+
+        bWorker.setOnClickListener {
+            context?.let {
+                val uploadWorkRequest: WorkRequest =
+                    OneTimeWorkRequestBuilder<LongFileWorker>()
+                        .build()
+                WorkManager
+                    .getInstance(it)
+                    .enqueue(uploadWorkRequest)
             }
         }
+
         return root
     }
 
@@ -67,16 +84,6 @@ class LongTaskFragment : Fragment() {
                 LoooooongFile.appendInput(it, "$i = $sBinary")
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //scope.cancel()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //scope.cancel()
     }
 
     companion object {
